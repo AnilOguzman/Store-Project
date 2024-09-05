@@ -1,0 +1,99 @@
+# Build artifacts
+bin/
+obj/
+out/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# VS Code directories
+.vscode/
+
+# Logs
+*.log
+
+# NPM Packages
+node_modules/
+jspm_packages/
+
+# OS Generated Files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Visual Studio auto generated files
+.vs/
+
+# Rider
+.idea/
+
+# JetBrains Rider temp files
+.idea/
+*.sln.iml
+
+# Database
+*.mdf
+*.ldf
+
+# Entity Framework Migrations
+Migrations/
+
+# Resharper auto generated files
+_ReSharper*/
+*.[rR]e[Ss]harper
+
+# Nuget Packages
+*.nupkg
+.nuget/
+
+# DotNet compile/restore
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Web specific
+wwwroot/
+dist/
+build/
+
+# Publish output
+publish/
+
+# Azure Web App deploy
+.cscfg
+.deploy.props
+
+# Yarn
+.yarn/
+.pnp.*
+.yarnclean
+.yarn-integrity
+.yarn-error.log
+
+# Coverage Reports
+coverage/
+
+# SQLite database
+*.db
+*.sqlite
+*.sqlite3
+
+# Test Results
+TestResults/

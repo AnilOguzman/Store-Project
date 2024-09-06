@@ -1,9 +1,11 @@
 import React from "react";
 import { Avatar, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
   return (
     <Card>
+        
             <CardHeader
                 avatar={
                     <Avatar sx={{ bgcolor: 'secondary.main' }}>
@@ -29,8 +31,8 @@ const ProductCard = ({ product }) => {
                 </Typography>
             </CardContent>
             <CardActions>
-                <Button size="small">Add to Cart</Button>
-                <Button size="small">View</Button>
+                <Button component={Link}  size="small">Add to Cart</Button>
+                <Button component={Link} to={`/catalog/${product.id}`} size="small">View</Button>
             </CardActions>
         </Card>
   );

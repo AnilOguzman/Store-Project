@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import agent from "../../app/api/agent";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -18,11 +18,10 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5000/Products/${id}`)
-      .then((response) => setProduct(response.data))
-      .catch((error) => console.log(error))
-      .finally(() => setLoading(false));
+    agent.Catalog.details(id)
+    .then(response=>setProduct(response))
+    .catch(error=>console.log(error.response))
+    .finally(()=>setLoading(false));
   }, [id]);
 
   if (loading) return <h3>Loading</h3>;

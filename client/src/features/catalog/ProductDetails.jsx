@@ -11,6 +11,7 @@ import {
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import agent from "../../app/api/agent";
+import NotFound from "../../app/errors/NotFound";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -25,7 +26,7 @@ const ProductDetails = () => {
   }, [id]);
 
   if (loading) return <h3>Loading</h3>;
-  if (!product) return <h3>Product not found</h3>;
+  if (!product) return <NotFound/> ;  //normalde buna gerek yok ama görüyüm diye yazdım 
 
   return (
     <Grid container spacing={6}>

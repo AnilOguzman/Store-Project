@@ -31,6 +31,8 @@ axios.interceptors.response.use(
       case 500:
         router.navigate("/server-error",{state:{error:data}})
         break;
+      case 404:
+        router.navigate("/not-found")
     }
     return Promise.reject(error.response); //bunu eklemezsek dotnet ile oluşturduğumuz hataları yakalayamıyoruz ondan ekledik örneğin 2222 idli ürüne gitsek yakalar bu olmadan
     //ancak bu hataları yakalayabilmesi için bir özelliği yok daha o yüzden isteğin yapıldığı yerde catch kullanmak gerek.

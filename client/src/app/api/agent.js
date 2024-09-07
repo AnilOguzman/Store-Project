@@ -2,12 +2,15 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { router } from "../router/Routes";
 
+const sleep = () => new Promise(resolve => setTimeout(resolve,500)); //fonksiyon oluşturduk delay vermek için ürünler veya ürün yüklenirken
+
 axios.defaults.baseURL = "http://localhost:5000/";
 
 const responseBody = (response) => response.data;
 
 axios.interceptors.response.use(
-  (response) => {
+  async (response) => {
+    await sleep(); //fonksiyon başına async yazdık dikkat et 
     return response; //hata yoksa yapacağı virgülden sonrası ise hata varsa ne yapacağı
   },
   (error) => {

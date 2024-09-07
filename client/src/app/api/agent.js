@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { router } from "../router/Routes";
 
 axios.defaults.baseURL = "http://localhost:5000/";
 
@@ -28,7 +29,7 @@ axios.interceptors.response.use(
         toast.error(data.title);
         break;
       case 500:
-        toast.error(data.title);
+        router.navigate("/server-error",{state:{error:data}})
         break;
     }
     return Promise.reject(error.response); //bunu eklemezsek dotnet ile oluşturduğumuz hataları yakalayamıyoruz ondan ekledik örneğin 2222 idli ürüne gitsek yakalar bu olmadan

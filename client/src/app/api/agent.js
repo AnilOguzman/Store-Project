@@ -1,32 +1,55 @@
-import axios from "axios"
+import axios from "axios";
+import { toast } from "react-toastify";
 
-axios.defaults.baseURL='http://localhost:5000/'
+axios.defaults.baseURL = "http://localhost:5000/";
 
-const  responseBody=(response)=> response.data; 
+const responseBody = (response) => response.data;
 
-const requests={
-    get: (url) => axios.get(url).then(responseBody),
-    post: (url,body) => axios.post(url,body).then(responseBody),
-    put: (url,body) => axios.put(url,body).then(responseBody),
-    delete: (url) => axios.delete(url).then(responseBody),
-}
+axios.interceptors.response.use(
+  (response) => {
+    return response; //hata yoksa yapacağı virgülden sonrası ise hata varsa ne yapacağı
+  },
+  (error) => {
+    const { data, status } = error.response;
+    switch (status) {
+      case 400:
+        toast.error(data.title);
+        break;
+      case 401:
+        toast.error(data.title);
+        break;
+      case 500:
+        toast.error(data.title);
+        break;
+    }
+    return Promise.reject(error.response); //bunu eklemezsek dotnet ile oluşturduğumuz hataları yakalayamıyoruz ondan ekledik örneğin 2222 idli ürüne gitsek yakalar bu olmadan
+    //ancak bu hataları yakalayabilmesi için bir özelliği yok daha o yüzden isteğin yapıldığı yerde catch kullanmak gerek.
+  }
+);
 
-const testErrors={
-    get400Error : () => requests.get('buggy/bad-request'),
-    get401Error : () => requests.get('buggy/unauthorized'),
-    get404Error : () => requests.get('buggy/not-found'),
-    get500Error : () => requests.get('buggy/server-error'),
-    getValidationError : () => requests.get('buggy/validation-error')
-}
+const requests = {
+  get: (url) => axios.get(url).then(responseBody),
+  post: (url, body) => axios.post(url, body).then(responseBody),
+  put: (url, body) => axios.put(url, body).then(responseBody),
+  delete: (url) => axios.delete(url).then(responseBody),
+};
 
-const Catalog={
-    list: ()=>requests.get('products'),
-    details: (id)=>requests.get(`products/${id}`),
-}
+const testErrors = {
+  get400Error: () => requests.get("buggy/bad-request"),
+  get401Error: () => requests.get("buggy/unauthorized"),
+  get404Error: () => requests.get("buggy/not-found"),
+  get500Error: () => requests.get("buggy/server-error"),
+  getValidationError: () => requests.get("buggy/validation-error"),
+};
+
+const Catalog = {
+  list: () => requests.get("products"),
+  details: (id) => requests.get(`products/${id}`),
+};
 //en başta urlyi default olarak ayarladığımız için yazmadık sadece gerekli kısmı yazdık.
 
-const agent={
-    Catalog,
-    testErrors
-}
+const agent = {
+  Catalog,
+  testErrors,
+};
 export default agent;

@@ -20,7 +20,7 @@ const ProductDetails = () => {
   useEffect(() => {
     agent.Catalog.details(id)
     .then(response=>setProduct(response))
-    .catch(error=>console.log(error.response))
+    .catch(error=>console.log(error)) //artık burada error.response yapmaya gerek yok hatayı zaten interceptorda döndürüyoruz return Promise.reject(error.response); bunu al döndür sadece
     .finally(()=>setLoading(false));
   }, [id]);
 

@@ -12,7 +12,16 @@ axios.interceptors.response.use(
   (error) => {
     const { data, status } = error.response;
     switch (status) {
-      case 400:
+      case 400:  //hem validation error hem badrequest 400 döner biz validationda yani formda modelState hatası çıktı mesela onu formun üstünde falan yazdırmamız gerek o yüzden böyle yaptık
+        if(data.errors){
+          const modelStateErrors=[];
+          for(const key in data.errors){ //key dediğimiz şey problem1 problem2 onların karşılığı ise this is the first error falan bunları aldık sadece keyleri değil
+            if(data.errors[key]){
+              modelStateErrors.push(data.errors[key]); 
+            }
+          }
+          throw modelStateErrors.flat(); //burdan throw ile attığımızı catch ile AboutPage'te ilgili yerde yakalıyoruz. flat methodu array içindeki sadece string kısmını almaya yarar
+        }
         toast.error(data.title);
         break;
       case 401:

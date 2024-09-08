@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { Typography } from '@mui/material'
 
 const ContactPage = () => {

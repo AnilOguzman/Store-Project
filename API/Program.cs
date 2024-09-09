@@ -21,7 +21,8 @@ builder.Services.AddCors(options =>
         {
             policy.AllowAnyOrigin()
                   .AllowAnyHeader()
-                  .AllowAnyMethod();
+                  .AllowAnyMethod()
+                  .AllowCredentials(); //kimlik bilgilerinin göndermesine izin vermek için yaptık
         });
 });
 

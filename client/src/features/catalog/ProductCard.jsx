@@ -6,13 +6,16 @@ import { Avatar, Button, Card, CardActions, CardContent, CardHeader, CardMedia, 
 import { Link } from "react-router-dom";
 import agent from "../../app/api/agent";
 import { LoadingButton } from '@mui/lab';
+import { useStoreContext } from "../../app/context/StoreContext";
 
 const ProductCard = ({ product }) => {
     const [loading,setLoading]=useState(false);
+    const {setBasket}=useStoreContext();
 
     const handleAddItem = (productId) => {
         setLoading(true);
         agent.Basket.addItem(productId)
+            .then((basket)=>setBasket(basket))
             .catch(error=>console.log(error))
             .finally(setLoading(false));
     }

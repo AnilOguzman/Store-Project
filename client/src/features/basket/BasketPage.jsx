@@ -15,22 +15,27 @@ import { LoadingButton } from '@mui/lab';
 
 const BasketPage = () => {
     const {basket,setBasket,removeItem}=useStoreContext();
-    const [loading,setLoading]=useState(false);
+    const [status,setStatus]=useState({
+        loading:false,
+        name:''    
+    }); //bunun amacı hangi butonda loading dönüyor onun doğruluğunu sağlamak çok gerek yok bence sadece loading yeterdi
+        //bastığında aşağıdaki fonksiyonlara ismi gönderip state'e kaydediyosun daha sonra loadingin çalışması için 
+        //butonda loading={status.loading && status.name==='add'+item.productId} kontrolünü yapıyosun eğer eşleşmezse loading çalışmıyor.
 
-    const handleAddItem = (productId) =>{
-        setLoading(true);
+    const handleAddItem = (productId,name) =>{
+        setStatus({loading:true,name});
         agent.Basket.addItem(productId)
             .then(basket=>setBasket(basket))
             .catch(error=>console.log(error))
-            .finally(()=>setLoading(false))
+            .finally(()=>setStatus({loading:false}))
     }
 
-    const handleRemoveItem = (productId,quantity=1) => {
-        setLoading(true);
+    const handleRemoveItem = (productId,quantity=1,name) => {
+        setStatus({loading:true,name});
         agent.Basket.removeItem(productId,quantity)
             .then(()=>removeItem(productId,quantity))
             .catch(error=>console.log(error))
-            .finally(()=>setLoading(false));
+            .finally(()=>setStatus({loading:false}))
     }
 
     if(basket==null) return <Typography variant='h3'>Your basket is empty.</Typography>
@@ -61,17 +66,17 @@ const BasketPage = () => {
                   </TableCell>
                   <TableCell align="right">${(item.price/100).toFixed(2)}</TableCell>
                   <TableCell align="center">
-                    <LoadingButton loading={loading} onClick={()=>handleRemoveItem(item.productId)}>
+                    <LoadingButton loading={status.loading && status.name==='rem'+item.productId} onClick={()=>handleRemoveItem(item.productId,1,'rem'+item.productId)}>
                         <Remove/>
                     </LoadingButton>
                     {item.quantity}
-                    <LoadingButton loading={loading} onClick={()=>handleAddItem(item.productId)}>
+                    <LoadingButton loading={status.loading && status.name==='add'+item.productId} onClick={()=>handleAddItem(item.productId,'add'+item.productId)}> 
                         <Add/>
                     </LoadingButton>
                   </TableCell>
                   <TableCell align="right">${((item.price/100) * item.quantity).toFixed(2)}</TableCell>
                   <TableCell align="right">
-                    <LoadingButton loading={loading} onClick={()=>handleRemoveItem(item.productId,item.quantity)} color='error'>
+                    <LoadingButton loading={status.loading && status.name==='del'+item.productId} onClick={()=>handleRemoveItem(item.productId,item.quantity,'del'+item.productId)} color='error'>
                         <Delete/>
                     </LoadingButton>
                   </TableCell>

@@ -5,6 +5,7 @@ import { router } from "../router/Routes";
 const sleep = () => new Promise(resolve => setTimeout(resolve,500)); //fonksiyon oluşturduk delay vermek için ürünler veya ürün yüklenirken
 
 axios.defaults.baseURL = "http://localhost:5000/";
+axios.defaults.withCredentials = true;
 
 const responseBody = (response) => response.data;
 
@@ -57,6 +58,12 @@ const testErrors = {
   getValidationError: () => requests.get("buggy/validation-error"),
 };
 
+const Basket = {
+  get: () => requests.get('basket'),
+  addItem: (productId, quantity = 1) => requests.post(`Basket?productId=${productId}&quantity=${quantity}`, {}),
+  removeItem: (productId, quantity = 1) => requests.del(`basket?productId=${productId}&quantity=${quantity}`)
+}
+
 const Catalog = {
   list: () => requests.get("products"),
   details: (id) => requests.get(`products/${id}`),
@@ -66,5 +73,6 @@ const Catalog = {
 const agent = {
   Catalog,
   testErrors,
+  Basket
 };
 export default agent;

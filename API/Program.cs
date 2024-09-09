@@ -19,12 +19,13 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
         policy =>
         {
-            policy.AllowAnyOrigin()
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials(); //kimlik bilgilerinin göndermesine izin vermek için yaptık
+            policy.WithOrigins("http://localhost:3000") 
+                  .AllowCredentials()                  
+                  .AllowAnyHeader()                    
+                  .AllowAnyMethod();                   
         });
 });
+
 
 var app = builder.Build();
 

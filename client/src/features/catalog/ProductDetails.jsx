@@ -14,11 +14,13 @@ import React, { useEffect, useState } from "react";
 import agent from "../../app/api/agent";
 import NotFound from "../../app/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
-import { useStoreContext } from "../../app/context/StoreContext";
 import { LoadingButton } from "@mui/lab";
+import { useDispatch, useSelector } from "react-redux";
+import { removeItem, setBasket } from "../basket/basketSlice";
 
 const ProductDetails = () => {
-  const { basket, setBasket, removeItem } = useStoreContext();
+  const { basket} = useSelector(i=>i.basket);
+  const dispatch = useDispatch();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -47,13 +49,13 @@ const ProductDetails = () => {
     if (!item || quantity > item.quantity) {
       const updateQuantity = item ? quantity - item.quantity : quantity;
       agent.Basket.addItem(product.id, updateQuantity)
-        .then((basket) => setBasket(basket))
+        .then((basket) => dispatch(setBasket(basket)))
         .catch((error) => console.log(error))
         .finally(() => setSubmitting(false));
     } else {
       const updatedQuantity = item.quantity - quantity;
       agent.Basket.removeItem(product.id, updatedQuantity)
-        .then(() => removeItem(product.id, updatedQuantity))
+        .then(() => dispatch(removeItem({productId:product.id, quantity:updatedQuantity}))) //burda da eşleşmesi için  productId ve quantity gönderiyoruz
         .catch((error) => console.log(error))
         .finally(() => setSubmitting(false));
     }

@@ -1,22 +1,21 @@
-/* eslint-disable no-const-assign */
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import { Avatar, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import agent from "../../app/api/agent";
 import { LoadingButton } from '@mui/lab';
-import { useStoreContext } from "../../app/context/StoreContext";
 import { currencyFormat } from "../../app/util/util";
+import { useDispatch } from "react-redux";
+import { setBasket } from "../basket/basketSlice";
 
 const ProductCard = ({ product }) => {
     const [loading,setLoading]=useState(false);
-    const {setBasket}=useStoreContext();
+    const dispatch=useDispatch();
 
     const handleAddItem = (productId) => {
         setLoading(true);
         agent.Basket.addItem(productId)
-            .then((basket)=>setBasket(basket))
+            .then((basket)=>dispatch(setBasket(basket)))
             .catch(error=>console.log(error))
             .finally(setLoading(false));
     }

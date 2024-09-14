@@ -3,11 +3,11 @@
 import { AppBar, Badge, Box, IconButton, List, ListItem, Switch, Toolbar, Typography } from "@mui/material";
 import { ShoppingCart } from '@mui/icons-material';
 import { Link, NavLink } from "react-router-dom";
-import { useStoreContext } from "../context/StoreContext";
+import { useSelector } from "react-redux";
 
 const Header = ({ darkMode, handleThemeChange }) => {
-  const {basket}=useStoreContext();
-  const itemCount=basket.items.reduce((sum,item)=>sum+item.quantity,0);
+  const {basket}=useSelector(i=>i.basket);
+  const itemCount=basket?.items.reduce((sum,item)=>sum+item.quantity,0);
 
   const navStyles={
     color:'inherit', 

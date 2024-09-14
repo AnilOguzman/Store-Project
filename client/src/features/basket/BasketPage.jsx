@@ -8,15 +8,18 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Add, Delete, Remove } from "@mui/icons-material";
-import { useStoreContext } from "../../app/context/StoreContext";
 import agent from "../../app/api/agent";
 import { LoadingButton } from "@mui/lab";
 import BasketSummary from "./BasketSummary";
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import { removeItem, setBasket } from "./basketSlice";
 
 
 const BasketPage = () => {
-  const { basket, setBasket, removeItem } = useStoreContext();
+  const { basket } = useSelector((i)=>i.basket);
+  const dispatch = useDispatch();
+  
   const [status, setStatus] = useState({
     loading: false,
     name: "",
@@ -27,7 +30,7 @@ const BasketPage = () => {
   const handleAddItem = (productId, name) => {
     setStatus({ loading: true, name });
     agent.Basket.addItem(productId)
-      .then((basket) => setBasket(basket))
+      .then((basket) => dispatch(setBasket(basket)))
       .catch((error) => console.log(error))
       .finally(() => setStatus({ loading: false }));
   };
@@ -35,7 +38,7 @@ const BasketPage = () => {
   const handleRemoveItem = (productId, quantity = 1, name) => {
     setStatus({ loading: true, name });
     agent.Basket.removeItem(productId, quantity)
-      .then(() => removeItem(productId, quantity))
+      .then(() => dispatch(removeItem({productId, quantity}))) //curly brace koyduk yoksa çoklu arguement almaz dikkat et!
       .catch((error) => console.log(error))
       .finally(() => setStatus({ loading: false }));
   };

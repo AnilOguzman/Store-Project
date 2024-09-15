@@ -1,24 +1,16 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
+import React from "react";
 import { Avatar, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import agent from "../../app/api/agent";
 import { LoadingButton } from '@mui/lab';
 import { currencyFormat } from "../../app/util/util";
-import { useDispatch } from "react-redux";
-import { setBasket } from "../basket/basketSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addBasketItemAsync } from "../basket/basketSlice";
 
 const ProductCard = ({ product }) => {
-    const [loading,setLoading]=useState(false);
+    const {status}=useSelector(i=>i.basket);
     const dispatch=useDispatch();
 
-    const handleAddItem = (productId) => {
-        setLoading(true);
-        agent.Basket.addItem(productId)
-            .then((basket)=>dispatch(setBasket(basket)))
-            .catch(error=>console.log(error))
-            .finally(setLoading(false));
-    }
   return (
     <Card>
         
@@ -47,7 +39,7 @@ const ProductCard = ({ product }) => {
                 </Typography>
             </CardContent>
             <CardActions>
-                <LoadingButton loading={loading} onClick={()=>handleAddItem(product.id)} component={Link}  size="small">Add to Cart</LoadingButton>
+                <LoadingButton loading={status.includes("pendingAddItem" + product.id)} onClick={()=>dispatch(addBasketItemAsync({productId:product.id}))} component={Link}  size="small">Add to Cart</LoadingButton>
                 <Button component={Link} to={`/catalog/${product.id}`} size="small">View</Button>
             </CardActions>
         </Card>

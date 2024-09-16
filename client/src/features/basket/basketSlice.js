@@ -8,22 +8,22 @@ const initialState = {
 
 export const addBasketItemAsync = createAsyncThunk(
   "basket/addBasketItemAsync",
-  async ({ productId, quantity = 1 }) => {
+  async ({ productId, quantity = 1 },thunkAPI) => {
     try {
       return await agent.Basket.addItem(productId, quantity);
     } catch (error) {
-      console.log(error);
+      return  thunkAPI.rejectWithValue({error:error.data});
     }
   }
 );
 
 export const removeBasketItemAsync = createAsyncThunk(
   "basket/removeBasketItemAsync",
-  async ({ productId, quantity = 1 }) => {
+  async ({ productId, quantity = 1 },thunkAPI) => {
     try {
       return await agent.Basket.removeItem(productId, quantity);
     } catch (error) {
-      console.log(error);
+      return thunkAPI.rejectWithValue({error:error.data});
     }
   }
 );
@@ -45,7 +45,8 @@ export const basketSlice = createSlice({
       state.basket = action.payload;
       state.status = "idle";
     });
-    builder.addCase(addBasketItemAsync.rejected, (state) => {
+    builder.addCase(addBasketItemAsync.rejected, (state,action) => {
+      console.log(action.payload);
       state.status = "idle";
     });
     builder.addCase(removeBasketItemAsync.pending, (state, action) => {
@@ -60,7 +61,8 @@ export const basketSlice = createSlice({
 
       state.status="idle";
     });
-    builder.addCase(removeBasketItemAsync.rejected, (state) => {
+    builder.addCase(removeBasketItemAsync.rejected, (state,action) => {
+      console.log(action.payload);  
       state.status = "idle" ;
     });
   },

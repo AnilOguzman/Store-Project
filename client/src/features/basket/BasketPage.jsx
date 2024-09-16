@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, Button, Grid, Typography } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,40 +8,15 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Add, Delete, Remove } from "@mui/icons-material";
-import agent from "../../app/api/agent";
 import { LoadingButton } from "@mui/lab";
 import BasketSummary from "./BasketSummary";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { removeItem, setBasket } from "./basketSlice";
-
+import { addBasketItemAsync, removeBasketItemAsync } from "./basketSlice";
 
 const BasketPage = () => {
-  const { basket } = useSelector((i)=>i.basket);
+  const { basket, status } = useSelector((i) => i.basket);
   const dispatch = useDispatch();
-  
-  const [status, setStatus] = useState({
-    loading: false,
-    name: "",
-  }); //bunun amacı hangi butonda loading dönüyor onun doğruluğunu sağlamak çok gerek yok bence sadece loading yeterdi
-  //bastığında aşağıdaki fonksiyonlara ismi gönderip state'e kaydediyosun daha sonra loadingin çalışması için
-  //butonda loading={status.loading && status.name==='add'+item.productId} kontrolünü yapıyosun eğer eşleşmezse loading çalışmıyor.
-
-  const handleAddItem = (productId, name) => {
-    setStatus({ loading: true, name });
-    agent.Basket.addItem(productId)
-      .then((basket) => dispatch(setBasket(basket)))
-      .catch((error) => console.log(error))
-      .finally(() => setStatus({ loading: false }));
-  };
-
-  const handleRemoveItem = (productId, quantity = 1, name) => {
-    setStatus({ loading: true, name });
-    agent.Basket.removeItem(productId, quantity)
-      .then(() => dispatch(removeItem({productId, quantity}))) //curly brace koyduk yoksa çoklu arguement almaz dikkat et!
-      .catch((error) => console.log(error))
-      .finally(() => setStatus({ loading: false }));
-  };
 
   if (basket == null)
     return <Typography variant="h3">Your basket is empty.</Typography>;
@@ -80,26 +55,24 @@ const BasketPage = () => {
                 </TableCell>
                 <TableCell align="center">
                   <LoadingButton
-                    loading={
-                      status.loading && status.name === "rem" + item.productId
-                    }
+                    loading={status==="pendingRemoveItem" + item.productId+"rem"}
                     onClick={() =>
-                      handleRemoveItem(
-                        item.productId,
-                        1,
-                        "rem" + item.productId
+                      dispatch(
+                        removeBasketItemAsync({ productId: item.productId ,name:"rem"})
                       )
-                    }
+                    } //rem göderdik çünkü tamamını silmeyle tekini silme butonları aynı anda çalışıyordu ayırmak için onun sonuna del tekli silmek için de rem ekledik.
                   >
                     <Remove />
                   </LoadingButton>
                   {item.quantity}
                   <LoadingButton
-                    loading={
-                      status.loading && status.name === "add" + item.productId
-                    }
+                    loading={status==="pendingAddItem"+item.productId}
                     onClick={() =>
-                      handleAddItem(item.productId, "add" + item.productId)
+                      dispatch(
+                        addBasketItemAsync({
+                          productId: item.productId
+                        })
+                      )
                     }
                   >
                     <Add />
@@ -111,13 +84,15 @@ const BasketPage = () => {
                 <TableCell align="right">
                   <LoadingButton
                     loading={
-                      status.loading && status.name === "del" + item.productId
+                      status === "pendingRemoveItem"+item.productId+"del"
                     }
                     onClick={() =>
-                      handleRemoveItem(
-                        item.productId,
-                        item.quantity,
-                        "del" + item.productId
+                      dispatch(
+                        removeBasketItemAsync({
+                          productId: item.productId,
+                          quantity: item.quantity,
+                          name:"del"
+                        })
                       )
                     }
                     color="error"
@@ -134,7 +109,13 @@ const BasketPage = () => {
         <Grid item xs={6} />
         <Grid item xs={6}>
           <BasketSummary />
-          <Button component={Link} to='/checkout' variant="contained" size="large" fullWidth>
+          <Button
+            component={Link}
+            to="/checkout"
+            variant="contained"
+            size="large"
+            fullWidth
+          >
             Checkout
           </Button>
         </Grid>

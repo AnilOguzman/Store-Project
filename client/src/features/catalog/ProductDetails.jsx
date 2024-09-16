@@ -16,16 +16,16 @@ import NotFound from "../../app/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { LoadingButton } from "@mui/lab";
 import { useDispatch, useSelector } from "react-redux";
-import { removeItem, setBasket } from "../basket/basketSlice";
+import { addBasketItemAsync, removeBasketItemAsync } from "../basket/basketSlice";
 
 const ProductDetails = () => {
-  const { basket} = useSelector(i=>i.basket);
+  const { basket,status} = useSelector(i=>i.basket);
   const dispatch = useDispatch();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
+
   const item = basket?.items.find((i) => i.productId === product?.id);
 
   useEffect(() => {
@@ -45,19 +45,13 @@ const ProductDetails = () => {
   const handleUpdateCart = () => {
     if(!product) return;
 
-    setSubmitting(true);
     if (!item || quantity > item.quantity) {
       const updateQuantity = item ? quantity - item.quantity : quantity;
-      agent.Basket.addItem(product.id, updateQuantity)
-        .then((basket) => dispatch(setBasket(basket)))
-        .catch((error) => console.log(error))
-        .finally(() => setSubmitting(false));
+      dispatch(addBasketItemAsync({productId:product.id, quantity:updateQuantity}));
     } else {
       const updatedQuantity = item.quantity - quantity;
-      agent.Basket.removeItem(product.id, updatedQuantity)
-        .then(() => dispatch(removeItem({productId:product.id, quantity:updatedQuantity}))) //burda da eşleşmesi için  productId ve quantity gönderiyoruz
-        .catch((error) => console.log(error))
-        .finally(() => setSubmitting(false));
+      dispatch(removeBasketItemAsync({productId:product.id, quantity:updatedQuantity}));
+
     }
   };
 
@@ -119,7 +113,7 @@ const ProductDetails = () => {
           <Grid item xs={6}>
             <LoadingButton
               disabled={item?.quantity === quantity || !item && quantity === 0 }
-              loading={submitting}
+              loading={status.includes("pendingRemoveItem"+product.id)}
               onClick={handleUpdateCart}
               sx={{ height: "55px" }}
               color="primary"

@@ -5,11 +5,11 @@ const productsAdapter=createEntityAdapter();
 
 export const fetchProductAsync = createAsyncThunk(
     "catalog/fetchProductAsync",
-    async () => {
+    async (_,thunkAPI) => {
         try {
             return await agent.Catalog.list();
-        } catch (error) {
-            console.log(error);
+        } catch (error) {     
+            return thunkAPI.rejectWithValue({error:error.data}); //bunu denemek istersen agenttaki catalogtaki listin urlsini buggy/server-error yap.
         }
     }
 );  //Ürünleri artık basket,setBasket yerine burdan alacağız çünkü catalog sayfasına her girdiğimizde sayfa yükleniyor bu da zaman kaybı sadece en başta index.js'te yüklencek 
@@ -17,11 +17,11 @@ export const fetchProductAsync = createAsyncThunk(
 
 export const fetchOneProductAsync = createAsyncThunk(
     "catalog/fetchOneProductAsync",
-    async(productId)=>{
+    async(productId,thunkAPI)=>{
         try {
             return await agent.Catalog.details(productId);  //ürün detaylarına bakmak istediğimizde ürünler her seferinde yüklenmesin diye yapıyoruz.
-        } catch (error) {
-            console.log(error);
+        } catch (error) {   //bunlarda catch'e girsek bile dışarıdaki fonksiyon isteğin yerine getirildiğini düşünür.örneğin id'si 300 olan ürünü aradığını düşün.
+            return thunkAPI.rejectWithValue({error:error.data}); //bu yüzden biz bunu içerden reddedmeliyizki dışardaki anlayabilsin.
         }
     }
 )
@@ -42,7 +42,8 @@ export const catalogSlice = createSlice({
             state.status="idle";
             state.productsLoaded=true;
         });
-        builder.addCase(fetchProductAsync.rejected,(state)=>{
+        builder.addCase(fetchProductAsync.rejected,(state,action)=>{
+            console.log(action.payload);
             state.status="idle";
         });
         builder.addCase(fetchOneProductAsync.pending,(state)=>{
@@ -52,7 +53,8 @@ export const catalogSlice = createSlice({
             productsAdapter.upsertOne(state,action.payload);
             state.status="idle";
         }); 
-        builder.addCase(fetchOneProductAsync.rejected,(state)=>{
+        builder.addCase(fetchOneProductAsync.rejected,(state,action)=>{
+            console.log(action);
             state.status="idle";
         })
     })

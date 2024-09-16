@@ -11,30 +11,28 @@ import {
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import agent from "../../app/api/agent";
 import NotFound from "../../app/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { LoadingButton } from "@mui/lab";
 import { useDispatch, useSelector } from "react-redux";
 import { addBasketItemAsync, removeBasketItemAsync } from "../basket/basketSlice";
+import { fetchOneProductAsync, productSelectors } from "./catalogSlice";
 
 const ProductDetails = () => {
-  const { basket,status} = useSelector(i=>i.basket);
-  const dispatch = useDispatch();
   const { id } = useParams();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { basket,status} = useSelector(i=>i.basket);
+  const product=useSelector(state=>productSelectors.selectById(state,id));
+  const dispatch = useDispatch();
+  const {status:productStatus} = useSelector(i=>i.catalog) //status zaten olduğu için productStatus olarak kullancaz
   const [quantity, setQuantity] = useState(0);
 
   const item = basket?.items.find((i) => i.productId === product?.id);
-
+  console.log("deneme",product);
+  console.log("item",item);
   useEffect(() => {
     if (item) setQuantity(item.quantity);
-    agent.Catalog.details(id)
-      .then((response) => setProduct(response))
-      .catch((error) => console.log(error)) //artık burada error.response yapmaya gerek yok hatayı zaten interceptorda döndürüyoruz return Promise.reject(error.response); bunu al döndür sadece
-      .finally(() => setLoading(false));
-  }, [id, item]); //item ekledik çünkü ürün detaylarındaki Quantity in cart kısmındaki miktar değişmiyodu yoksa
+    if(!product) dispatch(fetchOneProductAsync(parseInt(id)))
+  }, [id, item,product,dispatch]); //item ekledik çünkü ürün detaylarındaki Quantity in cart kısmındaki miktar değişmiyodu yoksa
 
   const handleInputChange = (event) => {
     if (event.target.value >= 0) {
@@ -55,7 +53,7 @@ const ProductDetails = () => {
     }
   };
 
-  if (loading) return <LoadingComponent Message="Loading product..." />;
+  if (productStatus.includes("pending")) return <LoadingComponent Message="Loading product..." />;
   if (!product) return <NotFound />; //normalde buna gerek yok ama görüyüm diye yazdım
 
   return (

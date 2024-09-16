@@ -15,6 +15,17 @@ export const fetchProductAsync = createAsyncThunk(
 );  //Ürünleri artık basket,setBasket yerine burdan alacağız çünkü catalog sayfasına her girdiğimizde sayfa yükleniyor bu da zaman kaybı sadece en başta index.js'te yüklencek 
 //ve loading yazısı göreceğiz bidaha da yüklenmeyecek. Başka sayfadan cataloga girdiğimizde yüklenmeyeceğini görürsün.
 
+export const fetchOneProductAsync = createAsyncThunk(
+    "catalog/fetchOneProductAsync",
+    async(productId)=>{
+        try {
+            return await agent.Catalog.details(productId);  //ürün detaylarına bakmak istediğimizde ürünler her seferinde yüklenmesin diye yapıyoruz.
+        } catch (error) {
+            console.log(error);
+        }
+    }
+)
+
 export const catalogSlice = createSlice({
     name:"catalog",
     initialState:productsAdapter.getInitialState({
@@ -30,8 +41,18 @@ export const catalogSlice = createSlice({
             productsAdapter.setAll(state,action.payload);
             state.status="idle";
             state.productsLoaded=true;
-        })
+        });
         builder.addCase(fetchProductAsync.rejected,(state)=>{
+            state.status="idle";
+        });
+        builder.addCase(fetchOneProductAsync.pending,(state)=>{
+            state.status="pendingFetchOneProduct";
+        });
+        builder.addCase(fetchOneProductAsync.fulfilled,(state,action)=>{
+            productsAdapter.upsertOne(state,action.payload);
+            state.status="idle";
+        }); 
+        builder.addCase(fetchOneProductAsync.rejected,(state)=>{
             state.status="idle";
         })
     })

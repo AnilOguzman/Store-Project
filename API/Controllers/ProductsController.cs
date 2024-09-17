@@ -19,9 +19,12 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Product>>> GetProducts(string orderBy)
+        public async Task<ActionResult<List<Product>>> GetProducts(string orderBy,string searchTerm)
         {
-            var query = _context.Products.Sort(orderBy).AsQueryable(); //AsQueryable yaptık çünkü sort metotu this ile IQueryable alıyor.
+            var query = _context.Products
+            .Sort(orderBy)
+            .Search(searchTerm)
+            .AsQueryable(); //AsQueryable yaptık çünkü metotlar this ile IQueryable<Product> alıyor.
 
             
             
